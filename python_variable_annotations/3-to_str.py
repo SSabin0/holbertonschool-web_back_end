@@ -4,5 +4,5 @@ import math
 
 
 def to_str(n: float) -> str:
-    """return int from a float number"""
+    """return str from a float number"""
     return n
