@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Deletion-resilient hypermedia pagination."""
+"""
+Deletion-resilient hypermedia pagination
+"""
+
 import csv
 import math
-from typing import Dict, List
+from typing import List, Dict
 
 
 class Server:
-    """Server class to paginate a database of popular baby names."""
+    """Server class to paginate a database of popular baby names.
+    """
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
@@ -14,7 +18,8 @@ class Server:
         self.__indexed_dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset."""
+        """Cached dataset
+        """
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
@@ -24,7 +29,8 @@ class Server:
         return self.__dataset
 
     def indexed_dataset(self) -> Dict[int, List]:
-        """Dataset indexed by sorting position, starting at 0."""
+        """Dataset indexed by sorting position, starting at 0
+        """
         if self.__indexed_dataset is None:
             dataset = self.dataset()
             truncated_dataset = dataset[:1000]
@@ -33,25 +39,29 @@ class Server:
             }
         return self.__indexed_dataset
 
-    def get_hyper_index(self, index: int = None,
-                         page_size: int = 10) -> Dict:
-        """Return a deletion-resilient page of the dataset."""
+    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
+        """Return a deletion resilient page with hypermedia data
+        """
+        dataset = self.indexed_dataset()
+
+        assert index is None or index >= 0
+        assert index < len(dataset)
+
         if index is None:
             index = 0
-        assert isinstance(index, int) and 0 <= index <= len(
-            self.indexed_dataset())
 
-        data = self.indexed_dataset()
+        data = []
         i = index
-        collected = []
-        while len(collected) < page_size and i < len(data):
-            if i in data:
-                collected.append(data[i])
-            i += 1
 
-        return {
+        while len(data) < page_size and i < len(dataset):
+            if i in dataset:
+                data.append(dataset[i])
+            i = i + 1
+
+        hypermedia = {
             "index": index,
-            "next_index": i,
+            "data": data,
             "page_size": page_size,
-            "data": collected,
+            "next_index": i
         }
+        return hypermedia
