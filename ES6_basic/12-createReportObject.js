@@ -1,11 +1,4 @@
-function createEmployeesObject(departmentName, employees) {
-  const departmentEmployee = {
-    [`${departmentName}`]: employees,
-  };
-  return departmentEmployee;
-}
-
-function createReportObject(employeesList) {
+export default function createReportObject(employeesList) {
   return {
     allEmployees: { ...employeesList },
     getNumberOfDepartments(employees) {
